@@ -33,14 +33,15 @@
             }
         }
     </style>
+    <!-- 百度统计代码（已完整添加你的专属ID） -->
     <script>
-        var _hmt = _hmt || [];
-        (function() {
-            var hm = document.createElement("script");
-            hm.src = "https://hm.baidu.com/hm.js?bad01be59b0b8b97c440117980dd595d";
-            var s = document.getElementsByTagName("script")[0]; 
-            s.parentNode.insertBefore(hm, s);
-        })();
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bad01be59b0b8b97c440117980dd595d";
+      var s = document.getElementsByTagName("script")[0]; 
+      s.parentNode.insertBefore(hm, s);
+    })();
     </script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
@@ -65,15 +66,28 @@
                         </div>
                     </div>
 
-                    <div class="glass-effect rounded-xl p-6">
+                    <div class="glass-effect rounded-xl p-6 space-y-6">
+                        <!-- 原有开关：空格替换为逗号 -->
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-lg font-semibold">高级选项</h3>
+                                <h3 class="text-lg font-semibold">基础替换</h3>
                                 <p class="text-sm text-red-600">合并时将原文空格替换为逗号</p>
                             </div>
                             <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
                                 <input type="checkbox" id="replaceSpaces" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
                                 <label for="replaceSpaces" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+                            </div>
+                        </div>
+                        
+                        <!-- 新增开关：所有符号+空格替换为逗号 -->
+                        <div class="flex items-center justify-between border-t pt-4">
+                            <div>
+                                <h3 class="text-lg font-semibold">全量替换</h3>
+                                <p class="text-sm text-orange-600">所有符号+空格统一替换为逗号</p>
+                            </div>
+                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                                <input type="checkbox" id="replaceAllSymbols" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                <label for="replaceAllSymbols" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
                             </div>
                         </div>
                     </div>
@@ -97,7 +111,7 @@
                     </div>
                 </div>
 
-                <!-- 右侧：拆分 -->
+                <!-- 右侧：拆分（保留原有功能，无修改） -->
                 <div class="w-full md:w-1/2 space-y-6">
                     <div class="glass-effect rounded-xl p-6">
                         <div class="flex justify-between items-center mb-4">
@@ -153,7 +167,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // ==============================================
-    // 合并功能
+    // 合并功能（新增「所有符号+空格替换为逗号」逻辑）
     // ==============================================
     const mergeInputText       = document.getElementById('mergeInputText');
     const mergeBtn             = document.getElementById('mergeBtn');
@@ -166,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mergeParagraphCount  = document.getElementById('mergeParagraphCount');
     const mergeResultCharCount = document.getElementById('mergeResultCharCount');
     const replaceSpacesToggle  = document.getElementById('replaceSpaces');
+    const replaceAllSymbolsToggle = document.getElementById('replaceAllSymbols'); // 新增开关
     
     // 保存合并按钮原始文本
     const mergeCopyBtnOriginalHTML = mergeCopyBtn.innerHTML;
@@ -181,25 +196,44 @@ document.addEventListener('DOMContentLoaded', function() {
         const text = mergeInputText.value.trim();
         if (!text) return;
         
+        // 获取两个开关状态
         const replaceSpaces = replaceSpacesToggle.checked;
+        const replaceAllSymbols = replaceAllSymbolsToggle.checked;
         const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
         let merged = '';
         
         paragraphs.forEach((p, i) => {
             let t = p.trim();
-            if (replaceSpaces) t = t.replace(/\s+/g, '，');
+            
+            // 优先级：全量替换 > 仅空格替换
+            if (replaceAllSymbols) {
+                // 核心逻辑：所有符号（标点、特殊字符）+ 空格 替换为逗号
+                // 匹配所有非中文字符、非英文字母、非数字的字符
+                t = t.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '，');
+                // 多个连续逗号合并为一个
+                t = t.replace(/，+/g, '，');
+                // 移除首尾逗号
+                t = t.replace(/^，|，$/g, '');
+            } else if (replaceSpaces) {
+                // 原有逻辑：仅空格替换为逗号
+                t = t.replace(/\s+/g, '，');
+            }
             
             if (i === 0) {
                 merged = t;
             } else {
                 const last = merged.slice(-1);
-                const hasPunc = /[。！？，；：,.!?;:]/.test(last);
+                const hasPunc = /[。！？，；：,.!?;:]/g.test(last);
                 if (!hasPunc) merged += '，' + t;
                 else merged += t;
             }
         });
         
-        if (!replaceSpaces) merged = merged.replace(/\s+/g, ' ').trim();
+        // 非全量替换时，保留原有空格处理逻辑
+        if (!replaceAllSymbols && !replaceSpaces) {
+            merged = merged.replace(/\s+/g, ' ').trim();
+        }
+        
         mergeResultText.value = merged;
         // 正确存储原始内容（去除首尾空格）
         mergeResultText.dataset.originalContent = merged.trim();
@@ -208,6 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
         mergeCopyBtn.disabled = false;
         // 恢复按钮原始文本
         mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
+        
+        // 百度统计：新增全量替换按钮点击事件
+        _hmt.push(['_trackEvent', '合并功能', '替换模式', replaceAllSymbols ? '全量替换' : (replaceSpaces ? '仅空格替换' : '不替换')]);
     }
 
     function copyMergeToClipboard() {
@@ -236,6 +273,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
             }, 2500);
         });
+        
+        // 百度统计：复制事件
+        _hmt.push(['_trackEvent', '按钮点击', '复制合并结果', '用户复制合并后的文本']);
     }
 
     function clearMergeInput() {
@@ -255,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
     mergeInputText.addEventListener('input', updateMergeCounts);
 
     // ==============================================
-    // 拆分功能
+    // 拆分功能（无修改，保留原有逻辑）
     // ==============================================
     const splitInputText        = document.getElementById('splitInputText');
     const splitBtn              = document.getElementById('splitBtn');
@@ -308,6 +348,9 @@ document.addEventListener('DOMContentLoaded', function() {
         splitCopyBtn.disabled = false;
         // 恢复按钮原始文本
         splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
+        
+        // 百度统计：拆分功能事件
+        _hmt.push(['_trackEvent', '拆分功能', '保留情感符号', keepEmotional ? '是' : '否']);
     }
 
     function copySplitToClipboard() {
@@ -336,6 +379,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
             }, 2500);
         });
+        
+        // 百度统计：复制拆分结果事件
+        _hmt.push(['_trackEvent', '按钮点击', '复制拆分结果', '用户复制拆分后的文本']);
     }
 
     function clearSplitInput() {
@@ -360,8 +406,8 @@ document.addEventListener('DOMContentLoaded', function() {
     updateMergeCounts();
     updateSplitCounts();
     
-    mergeInputText.value = `这是第一段文本 包含一些需要替换的空格。
-这是第二段文本。`;
+    mergeInputText.value = `这是第一段文本 包含空格&符号！
+这是第二段文本，有逗号.句号;分号：冒号？`;
     splitInputText.value = `这是第一段文本，包含标点。这是第二句！这是第三句？`;
     
     updateMergeCounts();
