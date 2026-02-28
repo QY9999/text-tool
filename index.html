@@ -23,7 +23,6 @@
             .glass-effect { @apply bg-white bg-opacity-80 backdrop-blur-md; }
             .btn-transition { @apply transition-all duration-300 ease-in-out; }
             .input-focus { @apply focus:ring-2 focus:ring-primary focus:ring-opacity-50 focus:outline-none; }
-            /* 开关样式 */
             .toggle-checkbox:checked {
                 right: 0;
                 border-color: #68D391;
@@ -33,7 +32,7 @@
             }
         }
     </style>
-    <!-- 百度统计代码（已完整添加你的专属ID） -->
+    <!-- 百度统计 -->
     <script>
     var _hmt = _hmt || [];
     (function() {
@@ -45,373 +44,352 @@
     </script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-indigo-50 min-h-screen">
-    <div class="container mx-auto px-4 py-12 max-w-5xl">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-blue-600">文本段落合并工具</h1>
-        </header>
+<div class="container mx-auto px-4 py-12 max-w-5xl">
+<header class="text-center mb-12">
+    <h1 class="text-4xl md:text-5xl font-bold text-blue-600">文本段落合并工具</h1>
+</header>
 
-        <main class="space-y-8">
-            <div class="flex flex-col md:flex-row gap-8">
-                <!-- 左侧：合并 -->
-                <div class="w-full md:w-1/2 space-y-6">
-                    <div class="glass-effect rounded-xl p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold"><i class="fa fa-compress mr-2 text-primary"></i>段落合并</h2>
-                            <button id="clearMergeBtn" class="text-sm text-gray-500 hover:text-red-500"><i class="fa fa-trash-o mr-1"></i>清空</button>
-                        </div>
-                        <textarea id="mergeInputText" class="w-full h-64 p-4 border rounded-lg" placeholder="粘贴需要合并的文本..."></textarea>
-                        <div class="mt-2 text-sm text-gray-500">
-                            <span id="mergeCharCount">字符数: 0</span> |
-                            <span id="mergeParagraphCount">段落数: 0</span>
-                        </div>
-                    </div>
+<main class="space-y-8">
+<div class="flex flex-col md:flex-row gap-8">
 
-                    <div class="glass-effect rounded-xl p-6 space-y-6">
-                        <!-- 原有开关：空格替换为逗号 -->
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold">基础替换</h3>
-                                <p class="text-sm text-red-600">合并时将原文空格替换为逗号</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                <input type="checkbox" id="replaceSpaces" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                <label for="replaceSpaces" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
-                            </div>
-                        </div>
-                        
-                        <!-- 新增开关：所有符号+空格替换为逗号 -->
-                        <div class="flex items-center justify-between border-t pt-4">
-                            <div>
-                                <h3 class="text-lg font-semibold">全量替换</h3>
-                                <p class="text-sm text-orange-600">所有符号+空格统一替换为逗号</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                <input type="checkbox" id="replaceAllSymbols" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                <label for="replaceAllSymbols" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center">
-                        <button id="mergeBtn" class="px-8 py-3 bg-primary hover:bg-accent text-white rounded-lg flex items-center">
-                            <i class="fa fa-magic mr-2"></i>合并段落
-                        </button>
-                    </div>
-
-                    <div id="mergeResultSection" class="glass-effect rounded-xl p-6 opacity-0">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold"><i class="fa fa-check-circle mr-2 text-green-500"></i>合并结果</h2>
-                            <span id="mergeCopySuccess" class="text-sm text-green-500 hidden"><i class="fa fa-check"></i> 已复制</span>
-                        </div>
-                        <textarea id="mergeResultText" class="w-full min-h-[120px] p-4 bg-gray-50 border rounded-lg input-focus"></textarea>
-                        <div class="mt-3 flex justify-between">
-                            <span class="text-sm text-gray-500" id="mergeResultCharCount">字符数: 0</span>
-                            <button id="mergeCopyBtn" disabled class="px-4 py-2 border border-primary text-primary hover:bg-blue-50 rounded-lg text-sm"><i class="fa fa-copy mr-1"></i>复制</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 右侧：拆分（保留原有功能，无修改） -->
-                <div class="w-full md:w-1/2 space-y-6">
-                    <div class="glass-effect rounded-xl p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold"><i class="fa fa-expand mr-2 text-purple-500"></i>段落拆分</h2>
-                            <button id="clearSplitBtn" class="text-sm text-gray-500 hover:text-red-500"><i class="fa fa-trash-o mr-1"></i>清空</button>
-                        </div>
-                        <textarea id="splitInputText" class="w-full h-64 p-4 border rounded-lg" placeholder="粘贴需要拆分的文本..."></textarea>
-                        <div class="mt-2 text-sm text-gray-500"><span id="splitCharCount">字符数: 0</span></div>
-                    </div>
-
-                    <div class="glass-effect rounded-xl p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h3 class="text-lg font-semibold">拆分设置</h3>
-                                <p class="text-sm text-purple-600">保留问号(!)和感叹号(?)等情感符号</p>
-                            </div>
-                            <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
-                                <input type="checkbox" id="keepEmotionalPunctuation" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
-                                <label for="keepEmotionalPunctuation" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-center">
-                        <button id="splitBtn" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center">
-                            <i class="fa fa-scissors mr-2"></i>拆分段落
-                        </button>
-                    </div>
-
-                    <div id="splitResultSection" class="glass-effect rounded-xl p-6 opacity-0">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-semibold"><i class="fa fa-check-circle mr-2 text-purple-500"></i>拆分结果</h2>
-                            <span id="splitCopySuccess" class="text-sm text-green-500 hidden"><i class="fa fa-check"></i> 已复制</span>
-                        </div>
-                        <textarea id="splitResultText" class="w-full min-h-[120px] p-4 bg-gray-50 border rounded-lg input-focus"></textarea>
-                        <div class="mt-3 flex justify-between">
-                            <span class="text-sm text-gray-500">
-                                <span id="splitResultCharCount">字符数: 0</span> |
-                                <span id="splitResultParagraphCount">段落数: 0</span>
-                            </span>
-                            <button id="splitCopyBtn" disabled class="px-4 py-2 border border-purple-500 text-purple-500 hover:bg-purple-50 rounded-lg text-sm"><i class="fa fa-copy mr-1"></i>复制</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer class="mt-16 text-center text-gray-500 text-sm">
-            <p>© 文本段落合并工具</p>
-        </footer>
+<!-- ====================== 合并模块 ====================== -->
+<div class="w-full md:w-1/2 space-y-6">
+<div class="glass-effect rounded-xl p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold"><i class="fa fa-compress mr-2 text-primary"></i>段落合并</h2>
+        <div class="flex gap-2">
+            <button id="pasteMergeBtn" class="text-sm text-blue-600 hover:text-blue-800">
+                <i class="fa fa-paste mr-1"></i>粘贴
+            </button>
+            <button id="clearMergeBtn" class="text-sm text-gray-500 hover:text-red-500">
+                <i class="fa fa-trash-o mr-1"></i>清空
+            </button>
+        </div>
     </div>
+    <textarea id="mergeInputText" class="w-full h-64 p-4 border rounded-lg" placeholder="粘贴需要合并的文本..."></textarea>
+    <div class="mt-2 text-sm text-gray-500">
+        <span id="mergeCharCount">字符数: 0</span> |
+        <span id="mergeParagraphCount">段落数: 0</span>
+    </div>
+</div>
+
+<div class="glass-effect rounded-xl p-6 space-y-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold">基础替换</h3>
+            <p class="text-sm text-red-600">合并时将原文空格替换为逗号</p>
+        </div>
+        <div class="relative inline-block w-10">
+            <input type="checkbox" id="replaceSpaces" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+            <label for="replaceSpaces" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+        </div>
+    </div>
+
+    <div class="flex items-center justify-between border-t pt-4">
+        <div>
+            <h3 class="text-lg font-semibold">全量替换</h3>
+            <p class="text-sm text-orange-600">所有符号+空格统一替换为逗号</p>
+        </div>
+        <div class="relative inline-block w-10">
+            <input type="checkbox" id="replaceAllSymbols" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+            <label for="replaceAllSymbols" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-center">
+    <button id="mergeBtn" class="px-8 py-3 bg-primary hover:bg-accent text-white rounded-lg flex items-center">
+        <i class="fa fa-magic mr-2"></i>合并段落
+    </button>
+</div>
+
+<div id="mergeResultSection" class="glass-effect rounded-xl p-6 opacity-0">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold"><i class="fa fa-check-circle mr-2 text-green-500"></i>合并结果</h2>
+        <span id="mergeCopySuccess" class="text-sm text-green-500 hidden"><i class="fa fa-check"></i> 已复制</span>
+    </div>
+    <textarea id="mergeResultText" class="w-full min-h-[120px] p-4 bg-gray-50 border rounded-lg input-focus"></textarea>
+    <div class="mt-3 flex justify-between">
+        <span class="text-sm text-gray-500" id="mergeResultCharCount">字符数: 0</span>
+        <button id="mergeCopyBtn" disabled class="px-4 py-2 border border-primary text-primary hover:bg-blue-50 rounded-lg text-sm"><i class="fa fa-copy mr-1"></i>复制</button>
+    </div>
+</div>
+</div>
+
+<!-- ====================== 拆分模块 ====================== -->
+<div class="w-full md:w-1/2 space-y-6">
+<div class="glass-effect rounded-xl p-6">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold"><i class="fa fa-expand mr-2 text-purple-500"></i>段落拆分</h2>
+        <div class="flex gap-2">
+            <button id="pasteSplitBtn" class="text-sm text-purple-600 hover:text-purple-800">
+                <i class="fa fa-paste mr-1"></i>粘贴
+            </button>
+            <button id="clearSplitBtn" class="text-sm text-gray-500 hover:text-red-500">
+                <i class="fa fa-trash-o mr-1"></i>清空
+            </button>
+        </div>
+    </div>
+    <textarea id="splitInputText" class="w-full h-64 p-4 border rounded-lg" placeholder="粘贴需要拆分的文本..."></textarea>
+    <div class="mt-2 text-sm text-gray-500"><span id="splitCharCount">字符数: 0</span></div>
+</div>
+
+<div class="glass-effect rounded-xl p-6">
+    <div class="flex items-center justify-between">
+        <div>
+            <h3 class="text-lg font-semibold">拆分设置</h3>
+            <p class="text-sm text-purple-600">保留问号(!)和感叹号(?)等情感符号</p>
+        </div>
+        <div class="relative inline-block w-10">
+            <input type="checkbox" id="keepEmotionalPunctuation" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer" checked/>
+            <label for="keepEmotionalPunctuation" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer"></label>
+        </div>
+    </div>
+</div>
+
+<div class="flex justify-center">
+    <button id="splitBtn" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg flex items-center">
+        <i class="fa fa-scissors mr-2"></i>拆分段落
+    </button>
+</div>
+
+<div id="splitResultSection" class="glass-effect rounded-xl p-6 opacity-0">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold"><i class="fa fa-check-circle mr-2 text-purple-500"></i>拆分结果</h2>
+        <span id="splitCopySuccess" class="text-sm text-green-500 hidden"><i class="fa fa-check"></i> 已复制</span>
+    </div>
+    <textarea id="splitResultText" class="w-full min-h-[120px] p-4 bg-gray-50 border rounded-lg input-focus"></textarea>
+    <div class="mt-3 flex justify-between">
+        <span class="text-sm text-gray-500">
+            <span id="splitResultCharCount">字符数: 0</span> |
+            <span id="splitResultParagraphCount">段落数: 0</span>
+        </span>
+        <button id="splitCopyBtn" disabled class="px-4 py-2 border border-purple-500 text-purple-500 hover:bg-purple-50 rounded-lg text-sm"><i class="fa fa-copy mr-1"></i>复制</button>
+    </div>
+</div>
+</div>
+
+</div>
+</main>
+
+<footer class="mt-16 text-center text-gray-500 text-sm">
+    <p>© 文本段落合并工具</p>
+</footer>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ==============================================
-    // 合并功能（新增「所有符号+空格替换为逗号」逻辑）
-    // ==============================================
-    const mergeInputText       = document.getElementById('mergeInputText');
-    const mergeBtn             = document.getElementById('mergeBtn');
-    const mergeCopyBtn         = document.getElementById('mergeCopyBtn');
-    const clearMergeBtn        = document.getElementById('clearMergeBtn');
-    const mergeResultSection   = document.getElementById('mergeResultSection');
-    const mergeResultText      = document.getElementById('mergeResultText');
-    const mergeCopySuccess     = document.getElementById('mergeCopySuccess');
-    const mergeCharCount       = document.getElementById('mergeCharCount');
-    const mergeParagraphCount  = document.getElementById('mergeParagraphCount');
-    const mergeResultCharCount = document.getElementById('mergeResultCharCount');
-    const replaceSpacesToggle  = document.getElementById('replaceSpaces');
-    const replaceAllSymbolsToggle = document.getElementById('replaceAllSymbols'); // 新增开关
-    
-    // 保存合并按钮原始文本
-    const mergeCopyBtnOriginalHTML = mergeCopyBtn.innerHTML;
 
-    function updateMergeCounts() {
-        const text = mergeInputText.value;
-        mergeCharCount.textContent = `字符数: ${text.length}`;
-        const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
-        mergeParagraphCount.textContent = `段落数: ${paragraphs.length}`;
-    }
+// ====================== 合并功能 ======================
+const mergeInputText       = document.getElementById('mergeInputText');
+const mergeBtn             = document.getElementById('mergeBtn');
+const mergeCopyBtn         = document.getElementById('mergeCopyBtn');
+const clearMergeBtn        = document.getElementById('clearMergeBtn');
+const pasteMergeBtn        = document.getElementById('pasteMergeBtn');
+const mergeResultSection   = document.getElementById('mergeResultSection');
+const mergeResultText      = document.getElementById('mergeResultText');
+const mergeCopySuccess     = document.getElementById('mergeCopySuccess');
+const mergeCharCount       = document.getElementById('mergeCharCount');
+const mergeParagraphCount  = document.getElementById('mergeParagraphCount');
+const mergeResultCharCount = document.getElementById('mergeResultCharCount');
+const replaceSpacesToggle  = document.getElementById('replaceSpaces');
+const replaceAllSymbolsToggle = document.getElementById('replaceAllSymbols');
+const mergeCopyBtnOriginalHTML = mergeCopyBtn.innerHTML;
 
-    function processMergeText() {
-        const text = mergeInputText.value.trim();
-        if (!text) return;
-        
-        // 获取两个开关状态
-        const replaceSpaces = replaceSpacesToggle.checked;
-        const replaceAllSymbols = replaceAllSymbolsToggle.checked;
-        const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
-        let merged = '';
-        
-        paragraphs.forEach((p, i) => {
-            let t = p.trim();
-            
-            // 优先级：全量替换 > 仅空格替换
-            if (replaceAllSymbols) {
-                // 核心逻辑：所有符号（标点、特殊字符）+ 空格 替换为逗号
-                // 匹配所有非中文字符、非英文字母、非数字的字符
-                t = t.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '，');
-                // 多个连续逗号合并为一个
-                t = t.replace(/，+/g, '，');
-                // 移除首尾逗号
-                t = t.replace(/^，|，$/g, '');
-            } else if (replaceSpaces) {
-                // 原有逻辑：仅空格替换为逗号
-                t = t.replace(/\s+/g, '，');
-            }
-            
-            if (i === 0) {
-                merged = t;
-            } else {
-                const last = merged.slice(-1);
-                const hasPunc = /[。！？，；：,.!?;:]/g.test(last);
-                if (!hasPunc) merged += '，' + t;
-                else merged += t;
-            }
-        });
-        
-        // 非全量替换时，保留原有空格处理逻辑
-        if (!replaceAllSymbols && !replaceSpaces) {
-            merged = merged.replace(/\s+/g, ' ').trim();
-        }
-        
-        mergeResultText.value = merged;
-        // 正确存储原始内容（去除首尾空格）
-        mergeResultText.dataset.originalContent = merged.trim();
-        mergeResultSection.classList.remove('opacity-0');
-        mergeResultCharCount.textContent = `字符数: ${merged.length}`;
-        mergeCopyBtn.disabled = false;
-        // 恢复按钮原始文本
-        mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
-        
-        // 百度统计：新增全量替换按钮点击事件
-        _hmt.push(['_trackEvent', '合并功能', '替换模式', replaceAllSymbols ? '全量替换' : (replaceSpaces ? '仅空格替换' : '不替换')]);
-    }
+function updateMergeCounts() {
+    const text = mergeInputText.value;
+    mergeCharCount.textContent = `字符数: ${text.length}`;
+    const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
+    mergeParagraphCount.textContent = `段落数: ${paragraphs.length}`;
+}
 
-    function copyMergeToClipboard() {
-        const txt = mergeResultText.value.trim();
-        if (!txt) return;
-        
-        // 精确对比：都去除首尾空格后再比较
-        const originalContent = mergeResultText.dataset.originalContent || '';
-        const currentContent = mergeResultText.value.trim();
-        const isCustom = currentContent !== originalContent;
-        
-        navigator.clipboard.writeText(mergeResultText.value).then(() => {
-            mergeCopySuccess.classList.remove('hidden');
-            
-            if (isCustom) {
-                mergeCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制 <span style="color:red;">(自定义)</span>';
-                mergeCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制<span style="color:red;">自定义</span>内容';
-            } else {
-                mergeCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制';
-                mergeCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制';
-            }
-            
-            setTimeout(() => {
-                mergeCopySuccess.classList.add('hidden');
-                // 恢复原始按钮文本
-                mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
-            }, 2500);
-        });
-        
-        // 百度统计：复制事件
-        _hmt.push(['_trackEvent', '按钮点击', '复制合并结果', '用户复制合并后的文本']);
-    }
-
-    function clearMergeInput() {
-        mergeInputText.value = '';
+// 粘贴到合并输入框
+pasteMergeBtn.addEventListener('click', async () => {
+    try {
+        const text = await navigator.clipboard.readText();
+        mergeInputText.value = text;
         updateMergeCounts();
-        mergeResultSection.classList.add('opacity-0');
-        mergeResultText.value = '';
-        mergeResultText.dataset.originalContent = '';
-        mergeCopyBtn.disabled = true;
-        // 恢复按钮原始文本
-        mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
-    }
+    } catch (e) {}
+});
 
-    mergeBtn.addEventListener('click', processMergeText);
-    mergeCopyBtn.addEventListener('click', copyMergeToClipboard);
-    clearMergeBtn.addEventListener('click', clearMergeInput);
-    mergeInputText.addEventListener('input', updateMergeCounts);
-
-    // ==============================================
-    // 拆分功能（无修改，保留原有逻辑）
-    // ==============================================
-    const splitInputText        = document.getElementById('splitInputText');
-    const splitBtn              = document.getElementById('splitBtn');
-    const splitCopyBtn          = document.getElementById('splitCopyBtn');
-    const clearSplitBtn         = document.getElementById('clearSplitBtn');
-    const splitResultSection    = document.getElementById('splitResultSection');
-    const splitResultText       = document.getElementById('splitResultText');
-    const splitCopySuccess      = document.getElementById('splitCopySuccess');
-    const splitCharCount        = document.getElementById('splitCharCount');
-    const splitResultCharCount  = document.getElementById('splitResultCharCount');
-    const splitResultParagraphCount = document.getElementById('splitResultParagraphCount');
-    const keepEmotionalToggle   = document.getElementById('keepEmotionalPunctuation');
-    
-    // 保存拆分按钮原始文本
-    const splitCopyBtnOriginalHTML = splitCopyBtn.innerHTML;
-
-    function updateSplitCounts() {
-        splitCharCount.textContent = `字符数: ${splitInputText.value.length}`;
-    }
-
-    function processSplitText() {
-        let t = splitInputText.value.trim();
-        if (!t) return;
-
-        const keepEmotional = keepEmotionalToggle.checked;
-        let processedText = t;
-
-        if (keepEmotional) {
-            processedText = processedText
-                .replace(/[。，；：,.;:]/g, ' ')
-                .replace(/([！？!?])/g, '$1 ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        } else {
-            processedText = processedText
-                .replace(/[。！？，；：,.!?;:]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
+function processMergeText() {
+    const text = mergeInputText.value.trim();
+    if (!text) return;
+    const replaceSpaces = replaceSpacesToggle.checked;
+    const replaceAllSymbols = replaceAllSymbolsToggle.checked;
+    const paragraphs = text.split('\n').filter(p => p.trim().length > 0);
+    let merged = '';
+    paragraphs.forEach((p, i) => {
+        let t = p.trim();
+        if (replaceAllSymbols) {
+            t = t.replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '，');
+            t = t.replace(/，+/g, '，');
+            t = t.replace(/^，|，$/g, '');
+        } else if (replaceSpaces) {
+            t = t.replace(/\s+/g, '，');
         }
-
-        const lines = processedText.split(' ').filter(x => x);
-        const final = lines.join('\n');
-
-        splitResultText.value = final;
-        // 正确存储原始内容（去除首尾空格）
-        splitResultText.dataset.originalContent = final.trim();
-        splitResultSection.classList.remove('opacity-0');
-        splitResultCharCount.textContent = `字符数: ${final.length}`;
-        splitResultParagraphCount.textContent = `段落数: ${lines.length}`;
-        splitCopyBtn.disabled = false;
-        // 恢复按钮原始文本
-        splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
-        
-        // 百度统计：拆分功能事件
-        _hmt.push(['_trackEvent', '拆分功能', '保留情感符号', keepEmotional ? '是' : '否']);
+        if (i === 0) {
+            merged = t;
+        } else {
+            const last = merged.slice(-1);
+            const hasPunc = /[。！？，；：,.!?;:]/g.test(last);
+            if (!hasPunc) merged += '，' + t;
+            else merged += t;
+        }
+    });
+    if (!replaceAllSymbols && !replaceSpaces) {
+        merged = merged.replace(/\s+/g, ' ').trim();
     }
+    mergeResultText.value = merged;
+    mergeResultText.dataset.originalContent = merged.trim();
+    mergeResultSection.classList.remove('opacity-0');
+    mergeResultCharCount.textContent = `字符数: ${merged.length}`;
+    mergeCopyBtn.disabled = false;
+    mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
+}
 
-    function copySplitToClipboard() {
-        const txt = splitResultText.value.trim();
-        if (!txt) return;
-        
-        // 精确对比：都去除首尾空格后再比较
-        const originalContent = splitResultText.dataset.originalContent || '';
-        const currentContent = splitResultText.value.trim();
-        const isCustom = currentContent !== originalContent;
-        
-        navigator.clipboard.writeText(splitResultText.value).then(() => {
-            splitCopySuccess.classList.remove('hidden');
-            
-            if (isCustom) {
-                splitCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制 <span style="color:red;">(自定义)</span>';
-                splitCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制<span style="color:red;">自定义</span>内容';
-            } else {
-                splitCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制';
-                splitCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制';
-            }
-            
-            setTimeout(() => {
-                splitCopySuccess.classList.add('hidden');
-                // 恢复原始按钮文本
-                splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
-            }, 2500);
-        });
-        
-        // 百度统计：复制拆分结果事件
-        _hmt.push(['_trackEvent', '按钮点击', '复制拆分结果', '用户复制拆分后的文本']);
-    }
+function copyMergeToClipboard() {
+    const txt = mergeResultText.value.trim();
+    if (!txt) return;
+    const originalContent = mergeResultText.dataset.originalContent || '';
+    const currentContent = mergeResultText.value.trim();
+    const isCustom = currentContent !== originalContent;
+    navigator.clipboard.writeText(mergeResultText.value).then(() => {
+        mergeCopySuccess.classList.remove('hidden');
+        if (isCustom) {
+            mergeCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制 <span style="color:red;">(自定义)</span>';
+            mergeCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制<span style="color:red;">自定义</span>内容';
+        } else {
+            mergeCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制';
+            mergeCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制';
+        }
+        setTimeout(() => {
+            mergeCopySuccess.classList.add('hidden');
+            mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
+        }, 2500);
+    });
+}
 
-    function clearSplitInput() {
-        splitInputText.value = '';
+function clearMergeInput() {
+    mergeInputText.value = '';
+    updateMergeCounts();
+    mergeResultSection.classList.add('opacity-0');
+    mergeResultText.value = '';
+    mergeResultText.dataset.originalContent = '';
+    mergeCopyBtn.disabled = true;
+    mergeCopyBtn.innerHTML = mergeCopyBtnOriginalHTML;
+}
+
+mergeBtn.addEventListener('click', processMergeText);
+mergeCopyBtn.addEventListener('click', copyMergeToClipboard);
+clearMergeBtn.addEventListener('click', clearMergeInput);
+mergeInputText.addEventListener('input', updateMergeCounts);
+
+// ====================== 拆分功能 ======================
+const splitInputText        = document.getElementById('splitInputText');
+const splitBtn              = document.getElementById('splitBtn');
+const splitCopyBtn          = document.getElementById('splitCopyBtn');
+const clearSplitBtn         = document.getElementById('clearSplitBtn');
+const pasteSplitBtn         = document.getElementById('pasteSplitBtn');
+const splitResultSection    = document.getElementById('splitResultSection');
+const splitResultText       = document.getElementById('splitResultText');
+const splitCopySuccess      = document.getElementById('splitCopySuccess');
+const splitCharCount        = document.getElementById('splitCharCount');
+const splitResultCharCount  = document.getElementById('splitResultCharCount');
+const splitResultParagraphCount = document.getElementById('splitResultParagraphCount');
+const keepEmotionalToggle   = document.getElementById('keepEmotionalPunctuation');
+const splitCopyBtnOriginalHTML = splitCopyBtn.innerHTML;
+
+function updateSplitCounts() {
+    splitCharCount.textContent = `字符数: ${splitInputText.value.length}`;
+}
+
+// 粘贴到拆分输入框
+pasteSplitBtn.addEventListener('click', async () => {
+    try {
+        const text = await navigator.clipboard.readText();
+        splitInputText.value = text;
         updateSplitCounts();
-        splitResultSection.classList.add('opacity-0');
-        splitResultText.value = '';
-        splitResultText.dataset.originalContent = '';
-        splitCopyBtn.disabled = true;
-        // 恢复按钮原始文本
-        splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
+    } catch (e) {}
+});
+
+function processSplitText() {
+    let t = splitInputText.value.trim();
+    if (!t) return;
+    const keepEmotional = keepEmotionalToggle.checked;
+    let processedText = t;
+    if (keepEmotional) {
+        processedText = processedText
+            .replace(/[。，；：,.;:]/g, ' ')
+            .replace(/([！？!?])/g, '$1 ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    } else {
+        processedText = processedText
+            .replace(/[。！？，；：,.!?;:]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
     }
+    const lines = processedText.split(' ').filter(x => x);
+    const final = lines.join('\n');
+    splitResultText.value = final;
+    splitResultText.dataset.originalContent = final.trim();
+    splitResultSection.classList.remove('opacity-0');
+    splitResultCharCount.textContent = `字符数: ${final.length}`;
+    splitResultParagraphCount.textContent = `段落数: ${lines.length}`;
+    splitCopyBtn.disabled = false;
+    splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
+}
 
-    splitBtn.addEventListener('click', processSplitText);
-    splitCopyBtn.addEventListener('click', copySplitToClipboard);
-    clearSplitBtn.addEventListener('click', clearSplitInput);
-    splitInputText.addEventListener('input', updateSplitCounts);
+function copySplitToClipboard() {
+    const txt = splitResultText.value.trim();
+    if (!txt) return;
+    const originalContent = splitResultText.dataset.originalContent || '';
+    const currentContent = splitResultText.value.trim();
+    const isCustom = currentContent !== originalContent;
+    navigator.clipboard.writeText(splitResultText.value).then(() => {
+        splitCopySuccess.classList.remove('hidden');
+        if (isCustom) {
+            splitCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制 <span style="color:red;">(自定义)</span>';
+            splitCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制<span style="color:red;">自定义</span>内容';
+        } else {
+            splitCopyBtn.innerHTML = '<i class="fa fa-check mr-1"></i> 已复制';
+            splitCopySuccess.innerHTML = '<i class="fa fa-check"></i> 已复制';
+        }
+        setTimeout(() => {
+            splitCopySuccess.classList.add('hidden');
+            splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
+        }, 2500);
+    });
+}
 
-    // ==============================================
-    // 初始化
-    // ==============================================
-    updateMergeCounts();
+function clearSplitInput() {
+    splitInputText.value = '';
     updateSplitCounts();
-    
-    mergeInputText.value = `这是第一段文本 包含空格&符号！
+    splitResultSection.classList.add('opacity-0');
+    splitResultText.value = '';
+    splitResultText.dataset.originalContent = '';
+    splitCopyBtn.disabled = true;
+    splitCopyBtn.innerHTML = splitCopyBtnOriginalHTML;
+}
+
+splitBtn.addEventListener('click', processSplitText);
+splitCopyBtn.addEventListener('click', copySplitToClipboard);
+clearSplitBtn.addEventListener('click', clearSplitInput);
+splitInputText.addEventListener('input', updateSplitCounts);
+
+// ====================== 初始化 ======================
+updateMergeCounts();
+updateSplitCounts();
+
+mergeInputText.value = `这是第一段文本 包含空格&符号！
 这是第二段文本，有逗号.句号;分号：冒号？`;
-    splitInputText.value = `这是第一段文本，包含标点。这是第二句！这是第三句？`;
-    
-    updateMergeCounts();
-    updateSplitCounts();
+
+splitInputText.value = `这是第一段文本，包含标点。这是第二句！这是第三句？`;
+
+updateMergeCounts();
+updateSplitCounts();
+
 });
 </script>
 </body>
